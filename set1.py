@@ -155,11 +155,8 @@ class Tester(unittest.TestCase):
 	def testChallenge8(self):
 		with open('resources/set1-challenge8.txt', 'r') as testDataFile:
 			input = testDataFile.read().splitlines()
-			ecbEncryptedData = [hexData if isECBEncrypted(fromHex(hexData)) else None for hexData in input]
-			ecbEncryptedDataNumber = 0
-			for result in filter(lambda x: x, ecbEncryptedData):
-				ecbEncryptedDataNumber += 1 # Annoying way to test the size of the filtered result (filter returns an iterator)
-			self.assertEqual(ecbEncryptedDataNumber, 1)
+			ecbEncryptedData = [hexData for hexData in input if isECBEncrypted(fromHex(hexData))]
+			self.assertEqual(len(ecbEncryptedData), 1)
 
 if __name__ == '__main__':
 	unittest.main()
