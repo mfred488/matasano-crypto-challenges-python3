@@ -24,7 +24,7 @@ def toAscii(data):
 
 def fixedXor(x,y):
 	if len(x) != len(y):
-		raise Error('Arguments must have the same length')
+		raise Exception('Arguments must have the same length')
 	res = []
 	for i in range(len(x)):
 		res += [x[i] ^ y[i]]
@@ -51,7 +51,7 @@ def findSingleXorCharacter(data):
 
 def repeatingKeyXor(key, input):
 	if len(key) == 0:
-		raise Error('Key must not be empty!')
+		raise Exception('Key must not be empty!')
 	i = 0
 	res = []
 	for x in input:
@@ -69,7 +69,7 @@ def computeHammingWeight(x):
 
 def computeHammingDistance(x, y):
 	if len(x) != len(y):
-		raise Error('Arguments must have the same length')
+		raise Exception('Arguments must have the same length')
 	return sum([computeHammingWeight(y[i] - x[i]) for i in range(len(x))])
 
 def findKeySizeFromRepeatingXorEncryptedData(data, minSize=3, maxSize=40):
@@ -97,7 +97,7 @@ def decryptRepeatingXorEncryptedData(data):
 def isECBEncrypted(data):
 	"""We'll consider that the data is ECB-encrypted iof we find twice the same block (block length is assumed to be 16 bytes)"""
 	if len(data) % 16 != 0:
-		raise Error('Data length must be a multiple of 16 bytes')
+		raise Exception('Data length must be a multiple of 16 bytes')
 
 	blocks = [data[i*16:(i+1)*16] for i in range(len(data)//16)]
 	res = {}
@@ -155,8 +155,11 @@ class Tester(unittest.TestCase):
 	def testChallenge8(self):
 		with open('resources/set1-challenge8.txt', 'r') as testDataFile:
 			input = testDataFile.read().splitlines()
-			ecbEncryptedData = [hexData for hexData in input if isECBEncrypted(fromHex(hexData))]
-			self.assertEqual(len(ecbEncryptedData), 1)
+			ecbEncryptedData = [hexData if isECBEncrypted(fromHex(hexData)) else None for hexData in input]
+			ecbEncryptedDataNumber = 0
+			for result in filter(lambda x: x, ecbEncryptedData):
+				ecbEncryptedDataNumber += 1 # Annoying way to test the size of the filtered result (filter returns an iterator)
+			self.assertEqual(ecbEncryptedDataNumber, 1)
 
 if __name__ == '__main__':
 	unittest.main()
